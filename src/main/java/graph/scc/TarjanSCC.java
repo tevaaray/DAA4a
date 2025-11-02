@@ -5,74 +5,76 @@ import metrics.Metrics;
 import java.util.*;
 
 /**
- * Tarjan's algorithm for finding Strongly Connected Components (SCC).
- *
- * Works in O(V + E) time using DFS and low-link values.
- *
- * Each SCC is returned as a list of vertex indices.
+ * Tarjan's algorithm to find Strongly Connected Components (SCCs).
+ * Runs in O(V + E) time using DFS and low-link values.
  */
 public class TarjanSCC {
     private final Graph g;
+    private final int n;
     private final Metrics m;
     private int time;
-    private int[] disc;
-    private int[] low;
-    private boolean[] onStack;
+    private int[] disc, low;
+    private boolean[] stackMember;
     private Deque<Integer> stack;
-    private List<List<Integer>> components;
+    private List<List<Integer>> sccList;
 
     public TarjanSCC(Graph g, Metrics m) {
         this.g = g;
-        this.m = (m != null) ? m : new Metrics();
+        this.n = g.size();
+        this.m = m;
     }
 
-    /**
-     * Runs Tarjan's algorithm and returns the list of SCCs.
-     */
+    /** Run Tarjan's algorithm and return list of SCCs */
     public List<List<Integer>> run() {
-        int n = g.size();
         disc = new int[n];
         low = new int[n];
-        onStack = new boolean[n];
+        stackMember = new boolean[n];
         stack = new ArrayDeque<>();
-        components = new ArrayList<>();
+        sccList = new ArrayList<>();
         Arrays.fill(disc, -1);
-        time = 0;
+        Arrays.fill(low, -1);
 
         m.startTimer();
-        for (int v = 0; v < n; v++) {
-            if (disc[v] == -1) dfs(v);
+        for (int i = 0; i < n; i++) {
+            if (disc[i] == -1) dfs(i);
         }
         m.stopTimer();
-        return components;
+        return sccList;
     }
 
+    /** Recursive DFS utility for Tarjan */
     private void dfs(int u) {
-        disc[u] = low[u] = time++;
+        disc[u] = low[u] = ++time;
         stack.push(u);
-        onStack[u] = true;
+        stackMember[u] = true;
         m.dfsVisits++;
 
-        for (int v : g.neighbors(u)) {
+        for (Graph.Edge e : g.getAdj(u)) {  // <-- fixed here
+            int v = e.to;
             m.dfsEdges++;
+
             if (disc[v] == -1) {
                 dfs(v);
                 low[u] = Math.min(low[u], low[v]);
-            } else if (onStack[v]) {
+            } else if (stackMember[v]) {
                 low[u] = Math.min(low[u], disc[v]);
             }
         }
 
-        // if u is root of SCC
+        // head of SCC found
         if (low[u] == disc[u]) {
-            List<Integer> comp = new ArrayList<>();
+            List<Integer> scc = new ArrayList<>();
             while (true) {
-                int w = stack.pop();
-                onStack[w] = false;
-                comp.add(w);
-                if (w == u) break;
+                int v = stack.pop();
+                stackMember[v] = false;
+                scc.add(v);
+                if (v == u) break;
             }
-            components.add(comp);
+            sccList.add(scc);
         }
+    }
+
+    public List<List<Integer>> getSCCs() {
+        return sccList;
     }
 }

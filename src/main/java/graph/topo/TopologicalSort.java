@@ -5,27 +5,20 @@ import metrics.Metrics;
 import java.util.*;
 
 /**
- * Topological sorting for DAG using Kahn's algorithm.
- *
- * It assumes the graph is a DAG (no cycles).
- * If a cycle exists, the result will contain fewer nodes than graph.size().
+ * Kahn's algorithm for topological sorting of a DAG.
+ * Returns one valid topological order.
  */
 public class TopologicalSort {
 
-    /**
-     * Perform topological sort using Kahn's algorithm.
-     * @param g DAG graph
-     * @param m metrics collector
-     * @return list of vertices in topological order
-     */
+    /** Topological sort using Kahn's algorithm (BFS + indegree) */
     public static List<Integer> sort(Graph g, Metrics m) {
         int n = g.size();
         int[] indeg = new int[n];
 
-        // Compute in-degree of each vertex
+        // calculate indegree for each vertex
         for (int u = 0; u < n; u++) {
-            for (int v : g.neighbors(u)) {
-                indeg[v]++;
+            for (Graph.Edge e : g.getAdj(u)) {  // <-- fixed here
+                indeg[e.to]++;
             }
         }
 
@@ -35,17 +28,17 @@ public class TopologicalSort {
         }
 
         List<Integer> order = new ArrayList<>();
-
         m.startTimer();
         while (!q.isEmpty()) {
             int u = q.poll();
             order.add(u);
             m.kahnPops++;
-
-            for (int v : g.neighbors(u)) {
-                indeg[v]--;
-                m.kahnPushes++;
-                if (indeg[v] == 0) q.add(v);
+            for (Graph.Edge e : g.getAdj(u)) {  // <-- fixed here
+                indeg[e.to]--;
+                if (indeg[e.to] == 0) {
+                    q.add(e.to);
+                    m.kahnPushes++;
+                }
             }
         }
         m.stopTimer();

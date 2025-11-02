@@ -3,17 +3,15 @@ package graph.topo;
 import graph.Graph;
 import metrics.Metrics;
 import org.junit.jupiter.api.Test;
-import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Unit test for TopologicalSort (Kahn's algorithm).
- */
+import java.util.List;
+
 public class TopologicalSortTest {
 
     @Test
-    public void testSimpleDAG() {
-        Graph g = new Graph(6);
+    void testSimpleDAG() {
+        Graph g = new Graph(6, true);
         g.addEdge(5, 2);
         g.addEdge(5, 0);
         g.addEdge(4, 0);
@@ -24,11 +22,11 @@ public class TopologicalSortTest {
         Metrics m = new Metrics();
         List<Integer> order = TopologicalSort.sort(g, m);
 
-        // All 6 nodes should appear exactly once
-        assertEquals(6, order.size());
-        // Verify order respects dependencies (manual check for sample DAG)
-        int pos2 = order.indexOf(2);
-        int pos3 = order.indexOf(3);
-        assertTrue(pos2 < pos3 || pos3 < pos2); // loose check for DAG validity
+        System.out.println("Topological order: " + order);
+
+        assertEquals(6, order.size(), "Order should contain all vertices");
+        assertTrue(order.indexOf(5) < order.indexOf(2));
+        assertTrue(order.indexOf(2) < order.indexOf(3));
+        assertTrue(order.indexOf(3) < order.indexOf(1));
     }
 }

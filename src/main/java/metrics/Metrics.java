@@ -1,45 +1,61 @@
 package metrics;
 
 /**
- * Metrics collector for instrumentation.
+ * Metrics helper class to measure performance and count operations.
  *
- * It stores operation counters and timing information.
- * Used to compare performance of different graph algorithms.
+ * Used across SCC, TopologicalSort, and DAG Shortest Path modules.
  */
 public class Metrics {
-    // ---- SCC (Tarjan) ----
-    public long dfsVisits = 0;   // how many nodes were visited
-    public long dfsEdges = 0;    // how many edges explored
 
-    // ---- Topological Sort ----
-    public long kahnPushes = 0;  // number of nodes pushed to queue
-    public long kahnPops = 0;    // number of nodes popped from queue
+    // --- SCC metrics ---
+    public int dfsVisits = 0;
+    public int dfsEdges = 0;
 
-    // ---- DAG Shortest/Longest Paths ----
-    public long relaxations = 0; // number of relax() operations
+    // --- Topological sort metrics ---
+    public int kahnPushes = 0;
+    public int kahnPops = 0;
 
-    // ---- Timing ----
-    private long startTime = 0;
-    private long endTime = 0;
+    // --- DAG shortest/longest path metrics ---
+    public int relaxations = 0;
 
-    /** Start timer. */
+    // --- Timing ---
+    private long startTime;
+    private long endTime;
+
+    /** Start measuring execution time */
     public void startTimer() {
         startTime = System.nanoTime();
     }
 
-    /** Stop timer. */
+    /** Stop measuring execution time */
     public void stopTimer() {
         endTime = System.nanoTime();
     }
 
-    /** Return elapsed time in nanoseconds. */
-    public long elapsedNanos() {
-        return endTime - startTime;
+    /**
+     * Return elapsed time in milliseconds (ms)
+     */
+    public double getElapsedMs() {
+        if (endTime == 0) return 0;
+        return (endTime - startTime) / 1_000_000.0;
     }
 
-    /** Reset all counters and timers. */
+    /** Reset all metrics */
     public void reset() {
-        dfsVisits = dfsEdges = kahnPushes = kahnPops = relaxations = 0;
-        startTime = endTime = 0;
+        dfsVisits = 0;
+        dfsEdges = 0;
+        kahnPushes = 0;
+        kahnPops = 0;
+        relaxations = 0;
+        startTime = 0;
+        endTime = 0;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "DFS visits=%d, DFS edges=%d, Kahn pushes=%d, Kahn pops=%d, relax=%d, time=%.3f ms",
+                dfsVisits, dfsEdges, kahnPushes, kahnPops, relaxations, getElapsedMs()
+        );
     }
 }

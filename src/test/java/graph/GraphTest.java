@@ -3,20 +3,22 @@ package graph;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Basic unit test for Graph class.
- */
 public class GraphTest {
 
     @Test
-    public void testAddEdgeAndDurations() {
-        Graph g = new Graph(3);
-        g.addEdge(0, 1);
-        g.addEdge(1, 2);
-        g.setDuration(2, 5.0);
+    void testAddEdge() {
+        Graph g = new Graph(3, true);
+        g.addEdge(0, 1, 2.5);
+        g.addEdge(1, 2, 1.0);
 
         assertEquals(3, g.size());
-        assertTrue(g.neighbors(0).contains(1));
-        assertEquals(5.0, g.getDuration(2));
+        assertEquals(1, g.getAdj(0).size());
+        assertEquals(1, g.getAdj(1).size());
+        assertEquals(0, g.getAdj(2).size());
+
+        Graph.Edge e = g.getAdj(0).get(0);
+        assertEquals(0, e.from);
+        assertEquals(1, e.to);
+        assertEquals(2.5, e.weight);
     }
 }

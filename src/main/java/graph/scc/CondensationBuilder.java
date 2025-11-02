@@ -4,44 +4,38 @@ import graph.Graph;
 import java.util.*;
 
 /**
- * Builds condensation graph (DAG of SCCs).
+ * Builds condensation graph (DAG) from list of SCCs.
+ * Each SCC becomes a node in the new graph.
  */
 public class CondensationBuilder {
 
-    public static Result build(Graph original, List<List<Integer>> components) {
-        int n = original.size();
-        int compCount = components.size();
+    public static Graph build(Graph original, List<List<Integer>> sccs) {
+        int n = sccs.size();
+        Graph dag = new Graph(n, true);
 
-        int[] compId = new int[n];
-        for (int i = 0; i < compCount; i++) {
-            for (int v : components.get(i)) {
-                compId[v] = i;
+        // map each vertex to its SCC index
+        int[] compIndex = new int[original.size()];
+        for (int i = 0; i < sccs.size(); i++) {
+            for (int v : sccs.get(i)) {
+                compIndex[v] = i;
             }
         }
 
-        Graph dag = new Graph(compCount);
-        Set<String> seen = new HashSet<>();
-
-        for (int u = 0; u < n; u++) {
-            int cu = compId[u];
-            for (int v : original.neighbors(u)) {
-                int cv = compId[v];
-                if (cu != cv) {
-                    String key = cu + "-" + cv;
-                    if (seen.add(key)) dag.addEdge(cu, cv);
+        // build edges between components
+        Set<String> added = new HashSet<>();
+        for (int u = 0; u < original.size(); u++) {
+            for (Graph.Edge e : original.getAdj(u)) {  // <-- fixed here
+                int a = compIndex[u];
+                int b = compIndex[e.to];
+                if (a != b) {
+                    String key = a + "->" + b;
+                    if (!added.contains(key)) {
+                        dag.addEdge(a, b, e.weight);
+                        added.add(key);
+                    }
                 }
             }
         }
-
-        return new Result(dag, compId);
-    }
-
-    public static class Result {
-        public final Graph dag;
-        public final int[] compId;
-        public Result(Graph dag, int[] compId) {
-            this.dag = dag;
-            this.compId = compId;
-        }
+        return dag;
     }
 }
