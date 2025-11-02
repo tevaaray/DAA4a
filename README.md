@@ -70,7 +70,7 @@ java -cp target/classes data.GraphGenerator
 
 ---
 
-## 🧪 Experimental Results (based on your JSONs)
+## 🧪 Experimental Results 
 
 | Algorithm | Dataset | Nodes | Edges | Time (ms) | SCCs Found | Topo Order Size | Notes |
 |------------|----------|--------|--------|------------|--------------|------------------|--------|
