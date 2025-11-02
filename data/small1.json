@@ -1,0 +1,40 @@
+{
+  "nodes": 6,
+  "edges": [
+    {
+      "weight": 4.0,
+      "from": 4,
+      "to": 5
+    },
+    {
+      "weight": 1.0,
+      "from": 5,
+      "to": 4
+    },
+    {
+      "weight": 5.0,
+      "from": 2,
+      "to": 5
+    },
+    {
+      "weight": 1.0,
+      "from": 4,
+      "to": 1
+    },
+    {
+      "weight": 6.0,
+      "from": 2,
+      "to": 5
+    },
+    {
+      "weight": 2.0,
+      "from": 0,
+      "to": 1
+    },
+    {
+      "weight": 5.0,
+      "from": 0,
+      "to": 4
+    }
+  ]
+}
